@@ -1,0 +1,60 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+*.egg-info/
+dist/
+build/
+eggs/
+*.egg
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb_checkpoints/
+
+# PyTorch models
+*.pt
+*.pth
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# Project specific
+runs.ndjson
+device_profile.json
+
+# Operating System
+.DS_Store
+Thumbs.db
+*.swp
+*~
+
+# Distribution / packaging
+*.log
+logs/
+*.db
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/

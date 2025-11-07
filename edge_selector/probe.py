@@ -1,12 +1,15 @@
+# edge_selector/probe.py
+
 import platform, psutil, json, shutil, subprocess, time
 
 try:
     import pynvml
-    PYNVML_AVAILABLE = True
-except Exception:
-    PYNVML_AVAILABLE = False
+except ImportError:
+    pynvml = None
 
 class DeviceProbe:
+    """Collects hardware and thermal information about the device."""
+
     def probe_cpu(self):
         freq = psutil.cpu_freq()
         return {
@@ -18,21 +21,35 @@ class DeviceProbe:
 
     def probe_ram(self):
         vm = psutil.virtual_memory()
-        return {'ram_total_mb': vm.total // (1024 * 1024)}
+        return {'ram_total_mb': int(vm.total / (1024 * 1024))}
 
     def probe_gpu(self):
-        if not PYNVML_AVAILABLE:
-            return {'gpus': []}
-        pynvml.nvmlInit()
-        n = pynvml.nvmlDeviceGetCount()
-        gpus = []
-        for i in range(n):
-            h = pynvml.nvmlDeviceGetHandleByIndex(i)
-            gpus.append({
-                'name': pynvml.nvmlDeviceGetName(h).decode(),
-                'mem_total_mb': pynvml.nvmlDeviceGetMemoryInfo(h).total // (1024 * 1024)
-            })
-        return {'gpus': gpus}
+        info = {'gpus': []}
+        if pynvml is None:
+            print("⚠️ pynvml not installed – skipping GPU probe.")
+            return info
+
+        try:
+            pynvml.nvmlInit()
+            n = pynvml.nvmlDeviceGetCount()
+            for i in range(n):
+                h = pynvml.nvmlDeviceGetHandleByIndex(i)
+                name = pynvml.nvmlDeviceGetName(h)
+                try:
+                    name = name.decode()
+                except Exception:
+                    pass
+                mem = pynvml.nvmlDeviceGetMemoryInfo(h)
+                info['gpus'].append({
+                    'name': name,
+                    'mem_total_mb': int(mem.total / (1024 * 1024))
+                })
+            pynvml.nvmlShutdown()
+        except pynvml.NVMLError_LibraryNotFound:
+            print("⚠️ NVML not found – skipping GPU probe.")
+        except Exception as e:
+            print(f"⚠️ GPU probe error: {e}")
+        return info
 
     def probe_thermals(self):
         temps = {}
@@ -52,3 +69,8 @@ class DeviceProbe:
             'gpu': self.probe_gpu(),
             'thermals': self.probe_thermals()
         }
+
+if __name__ == "__main__":
+    profile = DeviceProbe().run()
+    json.dump(profile, open('device_profile.json', 'w'), indent=2)
+    print("✅ Device profile saved to device_profile.json")

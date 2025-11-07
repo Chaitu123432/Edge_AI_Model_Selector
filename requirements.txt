@@ -1,10 +1,19 @@
+# Core system packages
 psutil
 pynvml
-onnxruntime
-torch
-torchvision
+requests
 numpy
 pandas
 scikit-learn
+matplotlib
+
+# Deep learning (CPU)
+torch --index-url https://download.pytorch.org/whl/cpu
+torchvision --index-url https://download.pytorch.org/whl/cpu
+
+# Transformers / NLP / Audio
 transformers
-requests
+sentencepiece
+ultralytics
+resampy
+soundfile

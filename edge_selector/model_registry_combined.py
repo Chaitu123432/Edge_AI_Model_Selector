@@ -11,7 +11,8 @@ from transformers import (
     AutoTokenizer,
     AutoModelForSequenceClassification,
     WhisperProcessor,
-    WhisperForConditionalGeneration
+    WhisperForConditionalGeneration,
+    pipeline
 )
 from ultralytics import YOLO
 
@@ -54,8 +55,7 @@ def load_yolov8n_cpu():
     Loads YOLOv8n from Ultralytics (PyTorch implementation).
     Automatically downloads if missing and runs on CPU.
     """
-    model = YOLO("yolov8n.pt").model  # pure torch model
-    model.eval()
+    model = YOLO("yolov8n.pt")  # Automatically downloads weights if not present
     model.to("cpu")
     input_shape = (1, 3, 640, 640)
     return model, input_shape
@@ -74,7 +74,6 @@ def load_whisper_tiny():
     model_name = "openai/whisper-tiny.en"
     processor = WhisperProcessor.from_pretrained(model_name)
     model = WhisperForConditionalGeneration.from_pretrained(model_name)
-    model.eval()
     model.to("cpu")
     return (model, processor), (1, 80, 3000)
 
@@ -92,7 +91,6 @@ def load_distilbert():
     name = "distilbert-base-uncased"
     tokenizer = AutoTokenizer.from_pretrained(name)
     model = AutoModelForSequenceClassification.from_pretrained(name)
-    model.eval()
     model.to("cpu")
     return (model, tokenizer), (1, 64)
 
@@ -103,23 +101,15 @@ MODEL_REGISTRY["distilbert_base"] = {
 }
 
 # ========================
-# 🎧 5. Audio Classification (YAMNet - Lightweight substitute)
+# 🎧 5. Audio Classification (YAMNet)
 # ========================
 
 def load_yamnet():
     """
-    Lightweight YAMNet substitute for audio event classification.
-    Keeps similar input shape and conv load but avoids heavy deps.
+    Loads YAMNet (audio event classification).
+    Uses torch.hub to fetch a pretrained model.
     """
-    model = torch.nn.Sequential(
-        torch.nn.Conv2d(1, 16, 3, padding=1),
-        torch.nn.ReLU(),
-        torch.nn.Conv2d(16, 32, 3, padding=1),
-        torch.nn.ReLU(),
-        torch.nn.AdaptiveAvgPool2d((1, 1)),
-        torch.nn.Flatten(),
-        torch.nn.Linear(32, 10)
-    )
+    model = torch.hub.load('harritaylor/torchvggish', 'vggish')
     model.eval()
     input_shape = (1, 1, 96, 64)
     return model, input_shape
