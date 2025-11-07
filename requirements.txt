@@ -1,0 +1,10 @@
+psutil
+pynvml
+onnxruntime
+torch
+torchvision
+numpy
+pandas
+scikit-learn
+transformers
+requests
