@@ -1,0 +1,38 @@
+[
+  {
+    "name": "mobilenet_v2",
+    "task": "image_classification",
+    "accuracy": 0.82,
+    "size_mb": 14
+  },
+  {
+    "name": "resnet18",
+    "task": "image_classification",
+    "accuracy": 0.86,
+    "size_mb": 45
+  },
+  {
+    "name": "yolov8n",
+    "task": "object_detection",
+    "accuracy": 0.88,
+    "size_mb": 20
+  },
+  {
+    "name": "whisper_tiny",
+    "task": "speech_to_text",
+    "accuracy": 0.81,
+    "size_mb": 75
+  },
+  {
+    "name": "distilbert_base",
+    "task": "nlp_classification",
+    "accuracy": 0.90,
+    "size_mb": 66
+  },
+  {
+    "name": "yamnet",
+    "task": "audio_classification",
+    "accuracy": 0.80,
+    "size_mb": 23
+  }
+]
